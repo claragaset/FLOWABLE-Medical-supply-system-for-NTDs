@@ -44,5 +44,4 @@ public class SingletonConnection {
 			connection.close();
 		}
 	}
-
 }
