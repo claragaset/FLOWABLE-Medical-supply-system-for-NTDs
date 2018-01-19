@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <signal id="toProcess2" name="toProcess2" flowable:scope="global"></signal>
+  <process id="CallforforecastsHTTP" name="Call for forecastsHTTP" isExecutable="true" flowable:candidateStarterGroups="who">
+    <documentation>Call for forecast, diagram 2</documentation>
+    <userTask id="chekIfEnough" name="Check if enough Countries have submitted" flowable:candidateGroups="who" flowable:formKey="enoughSubmissions">
+      <extensionElements>
+        <modeler:group-info-name-who xmlns:modeler="http://flowable.org/modeler"><![CDATA[WHO]]></modeler:group-info-name-who>
+        <modeler:activiti-idm-candidate-group xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:activiti-idm-candidate-group>
+        <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[true]]></modeler:initiator-can-complete>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusiveGateway" name="Enough Countries have Submitted ?"></exclusiveGateway>
+    <endEvent id="endEvent"></endEvent>
+    <startEvent id="startEvent"></startEvent>
+    <sequenceFlow id="rowGatewayEnd" name="Yes" sourceRef="exclusiveGateway" targetRef="endEvent">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${enough == "Yes"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="rowUserTaskGateway" sourceRef="chekIfEnough" targetRef="exclusiveGateway"></sequenceFlow>
+    <intermediateCatchEvent id="timer" name="waits 15s">
+      <timerEventDefinition>
+        <timeDuration>PT15S</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <intermediateThrowEvent id="startForecasting" name="Start medicine forecast process">
+      <signalEventDefinition signalRef="toProcess2"></signalEventDefinition>
+    </intermediateThrowEvent>
+    <sequenceFlow id="sid-8DF3687F-095B-46B6-BEEF-BB19114D2AB7" sourceRef="sendCallForForecasts" targetRef="startForecasting"></sequenceFlow>
+    <sequenceFlow id="rowServiceTaskTimer" sourceRef="sendCallForForecasts" targetRef="timer"></sequenceFlow>
+    <sequenceFlow id="rowGatewayEmailService" name="No" sourceRef="exclusiveGateway" targetRef="sendCallForForecasts">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${enough == "No"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="rowStartServiceTask" sourceRef="startEvent" targetRef="sendCallForForecasts"></sequenceFlow>
+    <subProcess id="sendCallForForecasts" name="SendCallForForecasts">
+      <sequenceFlow id="sid-824D9861-C91A-4EB3-8E15-6EECCA19DEBB" sourceRef="emailService" targetRef="sid-207A3F9B-B49A-4267-8011-2DEE5E4C16AE"></sequenceFlow>
+      <sequenceFlow id="sid-0B490860-51CC-4B27-8C80-418F932A5A50" sourceRef="sid-7C17BFA5-99CA-430F-9D2E-8435E94D1DAF" targetRef="emailService"></sequenceFlow>
+      <endEvent id="sid-207A3F9B-B49A-4267-8011-2DEE5E4C16AE"></endEvent>
+      <serviceTask id="emailService" name="EmailService" flowable:type="mail">
+        <extensionElements>
+          <flowable:field name="to">
+            <flowable:string><![CDATA[claragaset4@gmail.com]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="from">
+            <flowable:string><![CDATA[claragaset4@gmail.com]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="subject">
+            <flowable:string><![CDATA[Forecast request]]></flowable:string>
+          </flowable:field>
+          <flowable:field name="text">
+            <flowable:string><![CDATA[Please submit the forecast. The link provided below will redirect you to the task.
+http://localhost:9090/flowable-task/workflow/#/apps/ntd/tasks]]></flowable:string>
+          </flowable:field>
+        </extensionElements>
+      </serviceTask>
+      <startEvent id="sid-7C17BFA5-99CA-430F-9D2E-8435E94D1DAF"></startEvent>
+    </subProcess>
+    <serviceTask id="serviceTask1" name="Test" flowable:class="CallTask"></serviceTask>
+    <sequenceFlow id="rowTimerUserTask" sourceRef="timer" targetRef="serviceTask1"></sequenceFlow>
+    <sequenceFlow id="sid-9FE966C9-0506-4CAB-8B28-56E1ED69A71D" sourceRef="serviceTask1" targetRef="chekIfEnough"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CallforforecastsHTTP">
+    <bpmndi:BPMNPlane bpmnElement="CallforforecastsHTTP" id="BPMNPlane_CallforforecastsHTTP">
+      <bpmndi:BPMNShape bpmnElement="chekIfEnough" id="BPMNShape_chekIfEnough">
+        <omgdc:Bounds height="79.0" width="144.0" x="465.0" y="105.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusiveGateway" id="BPMNShape_exclusiveGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="660.0" y="124.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="BPMNShape_endEvent">
+        <omgdc:Bounds height="28.0" width="28.0" x="945.0" y="130.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="30.0" width="30.0" x="30.0" y="129.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timer" id="BPMNShape_timer">
+        <omgdc:Bounds height="31.0" width="31.0" x="285.0" y="128.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startForecasting" id="BPMNShape_startForecasting">
+        <omgdc:Bounds height="30.0" width="30.0" x="135.0" y="225.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sendCallForForecasts" id="BPMNShape_sendCallForForecasts" isExpanded="false">
+        <omgdc:Bounds height="80.0" width="100.0" x="124.39999389648438" y="104.39999961853027"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="serviceTask1" id="BPMNShape_serviceTask1">
+        <omgdc:Bounds height="80.0" width="100.0" x="330.0" y="30.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-8DF3687F-095B-46B6-BEEF-BB19114D2AB7" id="BPMNEdge_sid-8DF3687F-095B-46B6-BEEF-BB19114D2AB7">
+        <omgdi:waypoint x="149.35911269326576" y="184.34999961853026"></omgdi:waypoint>
+        <omgdi:waypoint x="147.69726749829672" y="225.00060734548725"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="rowStartServiceTask" id="BPMNEdge_rowStartServiceTask">
+        <omgdi:waypoint x="59.94977105166014" y="144.07437716006478"></omgdi:waypoint>
+        <omgdi:waypoint x="124.39999389648261" y="144.39502449851912"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="rowUserTaskGateway" id="BPMNEdge_rowUserTaskGateway">
+        <omgdi:waypoint x="608.9499999999994" y="144.24825174825176"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0696864111483" y="144.06951219512194"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="rowServiceTaskTimer" id="BPMNEdge_rowServiceTaskTimer">
+        <omgdi:waypoint x="224.34999389647461" y="144.40122384990815"></omgdi:waypoint>
+        <omgdi:waypoint x="285.0" y="144.4793813830585"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-9FE966C9-0506-4CAB-8B28-56E1ED69A71D" id="BPMNEdge_sid-9FE966C9-0506-4CAB-8B28-56E1ED69A71D">
+        <omgdi:waypoint x="429.95000000000005" y="93.70238853503189"></omgdi:waypoint>
+        <omgdi:waypoint x="465.0" y="110.3343949044586"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="rowGatewayEnd" id="BPMNEdge_rowGatewayEnd">
+        <omgdi:waypoint x="699.9464260121797" y="144.0"></omgdi:waypoint>
+        <omgdi:waypoint x="945.0" y="144.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="rowGatewayEmailService" id="BPMNEdge_rowGatewayEmailService">
+        <omgdi:waypoint x="680.0" y="163.93502252252253"></omgdi:waypoint>
+        <omgdi:waypoint x="680.0" y="210.5"></omgdi:waypoint>
+        <omgdi:waypoint x="199.39999389648438" y="210.5"></omgdi:waypoint>
+        <omgdi:waypoint x="199.39999389648438" y="184.34999961853026"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="rowTimerUserTask" id="BPMNEdge_rowTimerUserTask">
+        <omgdi:waypoint x="306.9594860095259" y="129.65421677395514"></omgdi:waypoint>
+        <omgdi:waypoint x="330.0" y="72.35916666666664"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_sendCallForForecasts">
+    <bpmndi:BPMNPlane bpmnElement="sendCallForForecasts" id="BPMNPlane_sendCallForForecasts">
+      <bpmndi:BPMNEdge bpmnElement="sid-824D9861-C91A-4EB3-8E15-6EECCA19DEBB" id="BPMNEdge_sid-824D9861-C91A-4EB3-8E15-6EECCA19DEBB">
+        <omgdi:waypoint x="299.95000000000005" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-0B490860-51CC-4B27-8C80-418F932A5A50" id="BPMNEdge_sid-0B490860-51CC-4B27-8C80-418F932A5A50">
+        <omgdi:waypoint x="89.94999932866257" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="179.99999999999415" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="sid-207A3F9B-B49A-4267-8011-2DEE5E4C16AE" id="BPMNShape_sid-207A3F9B-B49A-4267-8011-2DEE5E4C16AE">
+        <omgdc:Bounds height="28.0" width="28.0" x="630.0" y="311.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="emailService" id="BPMNShape_emailService">
+        <omgdc:Bounds height="72.0" width="120.0" x="180.0" y="289.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-7C17BFA5-99CA-430F-9D2E-8435E94D1DAF" id="BPMNShape_sid-7C17BFA5-99CA-430F-9D2E-8435E94D1DAF">
+        <omgdc:Bounds height="30.0" width="30.0" x="60.0" y="310.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
