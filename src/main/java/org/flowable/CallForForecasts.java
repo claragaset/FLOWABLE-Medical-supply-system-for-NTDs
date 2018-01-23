@@ -1,30 +1,32 @@
 package org.flowable;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.zip.ZipInputStream;
-
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngines;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.repository.Deployment;
-import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.api.FormDeployment;
-import org.flowable.form.api.FormRepositoryService;
-import org.flowable.form.engine.FormEngine;
-import org.flowable.form.engine.FormEngines;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class CallForForecasts {
 	public static void main (String[] args) throws FileNotFoundException {
+		
+		ResultSet rs;
+		SingletonConnection connectionClass = SingletonConnection.getInstance();
+		try {
+			rs = connectionClass.executeQuery("SELECT count(*) FROM public.\"Forecast\" WHERE \"forecastSubmitted\";");
+			if (rs.next())
+			{
+				System.out.println (rs.getInt("count"));
+			}
+			rs.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//// ENGINE CONFIGURATION
-		ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
-		FormEngine formEngine = FormEngines.getDefaultFormEngine();
+//		ProcessEngine processEngine = ProcessEngines.getDefaultProcessEngine();
+//		FormEngine formEngine = FormEngines.getDefaultFormEngine();
 		
 		//// PROCESS DEPLOYMENT
-		RepositoryService repositoryService = processEngine.getRepositoryService();
-		Deployment deployment = repositoryService.createDeployment().addClasspathResource("Call_for_forecasts.bpmn20.xml").deploy();
+//		RepositoryService repositoryService = processEngine.getRepositoryService();
+//		Deployment deployment = repositoryService.createDeployment().addClasspathResource("Call_for_forecasts.bpmn20.xml").deploy();
 		
 //		String barFileName = "deployment/Deployment.zip";
 //		ZipInputStream inputStream = new ZipInputStream(new FileInputStream(barFileName));
